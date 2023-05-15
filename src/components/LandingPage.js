@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import Draggable from 'react-draggable';
-import { motion } from 'framer-motion';
-function Home() {
+import React, { useState, useRef } from 'react';
+import './LandingPage.css';
+import img from '../blob-scene-haikei.svg';
+function LandingPage() {
   const [image, setImage] = useState(null);
 
   const [rows, setRows] = useState([]);
@@ -43,9 +43,9 @@ function Home() {
             dataUrl,
             top: i,
             left: j,
-            width: width,
             style: {
               opacity: 1,
+              position: 'absolute',
             },
           });
         }
@@ -72,7 +72,6 @@ function Home() {
   const [isPlaced, setIsPlaced] = useState([
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   ]);
-  var placed = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   const divRef = useRef([]);
   const imgRef = useRef([]);
   function divResive() {
@@ -116,27 +115,36 @@ function Home() {
   const [startY, setStartY] = useState(0);
   const [endX, setEndX] = useState(0);
   const [endY, setEndY] = useState(0);
-  const [stebs, setStebs] = useState(0);
+
+  const [openInfo, setOpenInfo] = useState(false);
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100vw',
-        height: '100vh',
-        flexDirection: 'column',
-        position: 'relative',
-      }}
-    >
-      <h1> Matter Puzzle Game </h1>{' '}
-      <input type='file' onChange={handleImageUpload} /> <br />{' '}
-      {end ? (
-        <div>
-          <h1> You Win </h1>{' '}
+    <>
+      <div className='contaner'>
+        <div className='waviy'>
+          <span>Welcome</span>
+          <span>in</span>
+          <span>Matter</span>
+          <span>Game</span>
         </div>
-      ) : (
-        image && (
+        {/* <div class='content'>
+        <h2>Kemi</h2>
+        <h2>Kemi</h2>
+      </div> */}
+        <a
+          onClick={() => {
+            setOpenInfo(true);
+          }}
+          id='scroll-btn'
+          href={'#sec2'}
+        ></a>
+      </div>
+      <div className='about' id='sec2'>
+        <div className='inbut'>
+          <input type='file' onChange={handleImageUpload} />
+        </div>
+      </div>
+      <div>
+        {image && (
           <>
             <img
               src={URL.createObjectURL(image)}
@@ -150,83 +158,57 @@ function Home() {
               <option value={2}> 4 </option> <option value={4}> 16 </option>{' '}
               <option value={9}> 81 </option>{' '}
             </select>{' '}
-            <br /> <>{stebs}</>
-            <div
-              style={{
-                display: 'flex',
-                width: '50%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'row-reverse',
-                // position: 'relative',
-              }}
-            >
-              {rows.map(row => (
-                <div
-                  style={{
-                    display: 'flex',
-                    width: '50%',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexDirection: 'row-reverse',
-                    // position: 'relative',
-                  }}
-                >
-                  {row.map((piece, index) => (
-                    <img
-                      ref={el => (imgRef.current[piece.id] = el)}
-                      style={{
-                        position: 'realative',
-                      }}
-                      alt={`Piece ${piece.id}`}
-                      key={piece.id}
-                      id={piece.id}
-                      src={piece.dataUrl}
-                      onDragStart={(event, data) => {
-                        setStartX(event.clientX);
-                        setStartY(event.clientY);
-                      }}
-                      onDragEnd={(event, data) => {
-                        if (isPlaced.every(item => item === 1)) {
-                          setEnd(true);
-                        }
-                        setStebs(stebs + 1);
-                        const div1Rect =
-                          divRef.current[
-                            event.target.id
-                          ].getBoundingClientRect();
-                        console.log(div1Rect.x);
-                        console.log(div1Rect.y);
-                        console.log(event.clientX - piece.width + 60);
-                        console.log(event.clientY);
-                        if (
-                          div1Rect.x < event.clientX - piece.width + 80 &&
-                          div1Rect.x > event.clientX - piece.width - 60
-                        ) {
-                          imgRef.current[event.target.id].style.position =
-                            'absolute';
-                          imgRef.current[event.target.id].style.left =
-                            div1Rect.left + 'px';
-                          imgRef.current[event.target.id].style.top =
-                            div1Rect.top + 'px';
-                          placed[event.target.id] = 1;
-                          const newState = [...isPlaced];
-                          newState[event.target.id] = 1;
-                          setIsPlaced(newState);
-                          // setIsPlaced([...isPlaced, placed[event.target.id]]);
-                        }
-                      }}
-                    />
-                  ))}{' '}
-                </div>
-              ))}
-            </div>
-            <div>{divResive()}</div>
+            <br />{' '}
+            {rows.map(row => (
+              <div style={{ display: 'flex', width: '100%' }}>
+                {' '}
+                {row.map(piece => (
+                  <img
+                    ref={el => (imgRef.current[piece.id] = el)}
+                    style={piece.style}
+                    dragElastic={0.5}
+                    dragMomentum={false}
+                    alt={`Piece ${piece.id}`}
+                    key={piece.id}
+                    id={piece.id}
+                    src={piece.dataUrl}
+                    onDragStart={(event, data) => {
+                      setStartX(event.clientX);
+                      setStartY(event.clientY);
+                    }}
+                    onDragEnd={(event, data) => {
+                      const div1Rect =
+                        divRef.current[event.target.id].getBoundingClientRect();
+
+                      console.log(div1Rect.x);
+                      console.log(div1Rect.y - 150);
+                      console.log(event.clientX - startX);
+                      console.log(event.clientY - startY);
+                      if (
+                        event.clientX - startX <= div1Rect.x + 20 &&
+                        event.clientY - startY <= div1Rect.y - 150 &&
+                        event.clientX - startX >= div1Rect.x - 20
+                      ) {
+                        imgRef.current[event.target.id].style.left =
+                          div1Rect.left + 'px';
+                        imgRef.current[event.target.id].style.top =
+                          div1Rect.top + 'px';
+                        setIsPlaced(prev => {
+                          prev[event.target.id] = 1;
+                          return prev;
+                        });
+                      }
+                    }}
+                  />
+                ))}{' '}
+              </div>
+            ))}
+            {divResive()}
           </>
-        )
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }
 
-export default Home;
+export default LandingPage;
